@@ -7,7 +7,7 @@ import decimal
 from decimal import *
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], 'i:o:t:Zh')
+	opts, args = getopt.getopt(sys.argv[1:], 'i:o:e:t:Zh')
 																						
 except getopt.GetoptError:
 	print('ERROR getting options, please see help by specifing -h')
@@ -24,18 +24,22 @@ in_dir_name = "NOTHINGSET"
 out_base_name = "NOTHINGSET"
 do_orthos = "NOTHINGSET"
 orth_split = "NOTHINGSET"
+ending = ".counts"
+
 
 #print (opts) ## see args
 for opt, arg in opts:
 	if opt in ('-h', '--help'):
 		print("\n**** HTseq_to_edgeR.py | Written by DJP, 24/07/17 in Python 3.5 in Lausanne ****\n")
 		print("This program takes a directory count files from HTseq and produces a count file for EdgeR (csv), plus a stats file")
+		print("Note I assume the extension of the count files is .counts ***If this is different please use the -e option***")
 		print("NOTE: Sample names in the count file will be the same as the filename they are from.")
+		
 		print("\n**** USAGE **** \n")
 		
 		print("python HTseq_to_edgeR.py -i [input directory] -o [output_file_base] [options] \n")
 		print("\n**** USAGE OPTIONS ****\n")
-
+		print("\n-e\tcount file extension. set to whatever the file extension of the count files is. Default is .counts")
 		print("\n-Z\tortholog option. Default OFF. When OFF all count files sould have genes with the exactly the same names, e.g.\n")
 		print("\tFile_1:")
 		print("\tOG-1000_Tbi_TRINITY_DN59892_c0_g1_i1	1793")
@@ -55,6 +59,7 @@ for opt, arg in opts:
 		print("\tOG-1001_Tte_TRINITY_DN838_c0_g1_i1	251")
 		print("\tOG-1002_Tte_TRINITY_DN23660_c0_g1_i2	280")
 
+
 		print("\n-t\tortholog splitter option. Everything before this will be used as the gene name. Default is a underscore.\n\n")
 		
 
@@ -67,6 +72,8 @@ for opt, arg in opts:
 		do_orthos = 'YES'
 	elif opt in ('-t'):
 		orth_split = arg
+	elif opt in ('-e'):
+		ending = arg
 	else:
 		print("i dont know")
 		sys.exit(2)
@@ -87,6 +94,21 @@ else:
 if orth_split == "NOTHINGSET":
 	orth_split = "_"
 
+
+file_names_set = set()
+path = in_dir_name
+for path, subdirs, files in os.walk(path):
+	for name in files:
+		file_path = os.path.join(path, name)
+		
+		#print(file_path)
+		
+		if file_path.endswith(ending):
+			file_names_set.add(file_path)
+
+if len(file_names_set) == 0:	
+	print("found 0 files ending with " + ending + " in " + in_dir_name + "\n\nNote expected file extention can be specified with -e\n\n\n")
+	sys.exit(2)
 
 ##### read files and add counts to dict 
 
@@ -110,8 +132,6 @@ for path, subdirs, files in os.walk(path):
 		file_path = os.path.join(path, name)
 		
 		#print(file_path)
-
-		ending = ".counts"
 		
 		if file_path.endswith(ending):
 			curr_file = open(file_path)
@@ -123,7 +143,7 @@ for path, subdirs, files in os.walk(path):
 			too_low_aQual = 0
 			not_aligned = 0
 			alignment_not_unique = 0		
-			sample_name = file_path.rstrip("/").split("/")[-1].split(".counts")[0]
+			sample_name = file_path.rstrip("/").split("/")[-1].split(ending)[0]
 			sample_list.append(sample_name)
 			if file_N == 1:
 				first_file = file_path
@@ -224,6 +244,7 @@ for path, subdirs, files in os.walk(path):
 			
 	
 #### check read correct number of genes from each file
+
 
 gene_N_read_set = set(gene_N_read)
 if len(gene_N_read_set) != 1:
