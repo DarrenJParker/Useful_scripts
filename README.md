@@ -2,7 +2,7 @@
 
 Some potentially useful scripts.
 
-If you use any of the scripts in this repository please cite it as follows.
+If you use any of the scripts in this repository please cite it as follows:
 
 Parker, D.J. Useful_scripts, (2018), GitHub repository, https://github.com/DarrenJParker/Useful_scripts/
 
