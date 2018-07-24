@@ -256,7 +256,7 @@ print("\nFound " + str(len(sample_list)) + " samples each with " +  str(len(gene
 
 #### output counts
 
-count_file_name = out_base_name + "_H2E.counts"
+count_file_name = out_base_name + "_H2E.counts.csv"
 
 count_file = open(count_file_name, "w")
 
