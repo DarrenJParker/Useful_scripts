@@ -13,6 +13,6 @@ All scripts written in python3.4 or higher.
 
 * **Kalli_to_edgeR.py** | Takes a directory of Kallisto produced directories a single csv file for use in EdgeR (or similar), along with a stat file.
 
-* HTSeq accessory scripts
+* **HTSeq accessory scripts**
   * **Maker_gff_to_HTseq_gff.py** | Takes a gff produced by Maker2 and converts it for use in HTseq.
   * **HTSeq_to_edgeR.py** | Takes a directory of read count files from HTseq and produces a single csv file for use in EdgeR (or similar), along with a stat file.
