@@ -91,7 +91,7 @@ for line in in_gff:
 	feature = line.split("\t")[2]
 	descrip_line = line.split("\t")[8]
 	if feature == "gene":
-		out_gff_file.write(line + "\n")
+		out_gff_file.write(line.rstrip(";")  + ";" + "\n")
 	elif feature == "mRNA":
 		trans_ID = descrip_line.split("ID=")[1].split(";")[0]
 		gene_name =  trans_to_gene_dict.get(trans_ID)
@@ -99,7 +99,7 @@ for line in in_gff:
 			print("Something has gone wrong, Exiting!")
 			sys.exit(2)
 		
-		out_gff_file.write(line + "gene_id=" + gene_name + ";" + "\n")
+		out_gff_file.write(line.rstrip(";") + ";" + "gene_id=" + gene_name + ";" + "\n")
 			
 			
 	else:
@@ -134,11 +134,11 @@ for line in in_gff:
 				print("Something has gone wrong, Exiting!")
 				sys.exit(2)
 				
-			out_gff_file.write(line + "gene_id=" + gene_name + ";" + "\n")
+			out_gff_file.write(line.rstrip(";") + ";" + "gene_id=" + gene_name + ";" + "\n")
 		
 		## SKIp features that do not have Parent IDs (these should be masking annotations)
 		except:
-			out_gff_file.write(line + "\n")
+			out_gff_file.write(line.rstrip(";") + ";" + "\n")
 			skipped_features.add(feature)
 
 print("\nThe following features were skipped as the have no Parent ID. (Note - only really worry if any of these are exon. having 'match' listed here is expected)")
