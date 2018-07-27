@@ -37,7 +37,7 @@ for opt, arg in opts:
 		
 		print("\n**** USAGE **** \n")
 		
-		print("python HTseq_to_edgeR.py -i [input directory] -o [output_file_base] [options] \n")
+		print("python3 HTseq_to_edgeR.py -i [input directory] -o [output_file_base] [options] \n")
 		print("\n**** USAGE OPTIONS ****\n")
 		print("\n-e\tcount file extension. set to whatever the file extension of the count files is. Default is .counts")
 		print("\n-Z\tortholog option. Default OFF. When OFF all count files sould have genes with the exactly the same names, e.g.\n")

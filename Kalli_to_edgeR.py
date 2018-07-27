@@ -35,7 +35,7 @@ for opt, arg in opts:
 		print("NOTE: Sample names in the count file will be the same as the directory they are in.")
 		print("NOTE: Estimates of counts are rounded to integers.")
 		print("\n**** USAGE **** \n")
-		print("python  Kalli_to_edgeR.py -i input directory -o output_file_base [options] \n")
+		print("python3 Kalli_to_edgeR.py -i input directory -o output_file_base [options] \n")
 		print("\n**** USAGE OPTIONS ****\n")
 		print("\n-s\tisoform option. Specify gene-to-isoform file here to have the program sum isoform counts to genes. Default OFF\n")
 		print("\tgene-to-isoform file:")

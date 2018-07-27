@@ -33,7 +33,7 @@ for opt, arg in opts:
 		print("This program adds a gene ID to these features.")
 		
 		print("\n**** USAGE **** \n")
-		print("python Maker_gff_to_HTseq_gff.py -i [Maker gff file] -o [out prefix] \n")
+		print("python3 Maker_gff_to_HTseq_gff.py -i [Maker gff file] -o [out prefix] \n")
 		
 		print("\n**** Use in HTseq ****\n")
 		print("\n**** !!!NOTE the way to access HTseq may differ on your cluster! ****\n")		
