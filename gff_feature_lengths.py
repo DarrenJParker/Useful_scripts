@@ -83,7 +83,7 @@ for line in in_gff:
 		end_coord   = int(line.split("\t")[4])
 
 		
-		if start_coord >= end_coord:
+		if start_coord > end_coord:
 			print("Start coord is larger than end coord. I do not know how to deal with this... \n\nExiting.\n\n\n")
 			sys.exit(2)
 			
