@@ -20,3 +20,5 @@ All scripts written in python3.4 or higher.
 * **gff_feature_lengths.py** | Gets lengths of features in a gff file, summed by a parent ID.
 
 * **fasta_file_tidier.py** | Takes a fasta file, orders sequences by size, and renames them sequentially. Also filters out small contigs if required.
+
+* **gff_name_updater.py** | Updates the contig names of gff file made on one fasta file with those in a new fasta file (e.g. a renamed subset of the original file)
