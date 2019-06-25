@@ -30,7 +30,7 @@ ending = ".counts"
 #print (opts) ## see args
 for opt, arg in opts:
 	if opt in ('-h', '--help'):
-		print("\n**** HTseq_to_edgeR.py | Written by DJP, 24/07/17 in Python 3.5 in Lausanne ****\n")
+		print("\n**** HTseq_to_edgeR.py | v.2.0 | Written by DJP, 25/06/19 in Python 3.5 in Lausanne ****\n")
 		print("This program takes a directory count files from HTseq and produces a count file for EdgeR (csv), plus a stats file")
 		print("Note I assume the extension of the count files is .counts ***If this is different please use the -e option***")
 		print("NOTE: Sample names in the count file will be the same as the filename they are from.")
@@ -124,7 +124,9 @@ sample_list = []
 stat_file_name = out_base_name + "_H2E_stat_counts.txt"
 
 stat_file = open(stat_file_name, "w")
-stat_file.write("sample_name\ttotal_reads\tno_feature\tambiguous\ttoo_low_aQual\tnot_aligned\talignment_not_unique\n")
+## not adding total anymore as when mapping non-uniq this becomes wrong
+#stat_file.write("sample_name\ttotal_reads\ttotal_mapped_to_feat\tno_feature\tambiguous\ttoo_low_aQual\tnot_aligned\talignment_not_unique\n")
+stat_file.write("sample_name\ttotal_mapped_to_feat\tno_feature\tambiguous\ttoo_low_aQual\tnot_aligned\talignment_not_unique\n")
 
 path = in_dir_name
 for path, subdirs, files in os.walk(path):
@@ -137,6 +139,7 @@ for path, subdirs, files in os.walk(path):
 			curr_file = open(file_path)
 			curr_file_gene_N = 0
 			file_N = file_N + 1
+			mapped_to_feat = 0
 			total_reads = 0
 			no_feature = 0
 			ambiguous = 0
@@ -186,6 +189,7 @@ for path, subdirs, files in os.walk(path):
 								gene_list.append(gene_name)
 								curr_file_gene_N = curr_file_gene_N + 1
 								total_reads = total_reads + cnt_val
+								mapped_to_feat = mapped_to_feat + cnt_val
 							else:
 								print("Gene names (or orth names if using -Z option) are NOT unique in the first file read in (" + file_path + "), Please fix this before continuing, Exiting!" )
 								sys.exit(2)
@@ -233,13 +237,16 @@ for path, subdirs, files in os.walk(path):
 								count_dict[gene_name] = rec
 								curr_file_gene_N = curr_file_gene_N + 1
 								total_reads = total_reads + cnt_val
+								mapped_to_feat = mapped_to_feat + cnt_val
 								
 			gene_N_read.append(curr_file_gene_N)
 			# print(curr_file_gene_N)
 			# print(total_reads_mapped)
 			
-			stat_file.write(sample_name + "\t" + str(total_reads)  + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
-			
+			## not adding total anymore as when mapping non-uniq this becomes wrong
+			#stat_file.write(sample_name + "\t" + str(total_reads) + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
+			stat_file.write(sample_name + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
+						
 			
 			
 	
