@@ -11,6 +11,8 @@ All scripts written in python3.4 or higher.
 
 ## Scripts
 
+* **fasta_file_tidier.py** | Takes a fasta file, orders sequences by size, and renames them sequentially. Also filters out small contigs if required.
+
 * **Kalli_to_edgeR.py** | Takes a directory of Kallisto produced directories a single csv file for use in EdgeR (or similar), along with a stat file.
 
 * **HTSeq accessory scripts**
@@ -18,8 +20,6 @@ All scripts written in python3.4 or higher.
   * **HTSeq_to_edgeR.py** | Takes a directory of read count files from HTseq and produces a single csv file for use in EdgeR (or similar), along with a stat file.
 
 * **gff_feature_lengths.py** | Gets lengths of features in a gff file, summed by a parent ID.
-
-* **fasta_file_tidier.py** | Takes a fasta file, orders sequences by size, and renames them sequentially. Also filters out small contigs if required.
 
 * **gff_name_updater.py** | Updates the contig names of gff file made on one fasta file with those in a new fasta file (e.g. a renamed subset of the original file)
 
