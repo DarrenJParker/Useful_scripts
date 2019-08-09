@@ -22,3 +22,5 @@ All scripts written in python3.4 or higher.
 * **fasta_file_tidier.py** | Takes a fasta file, orders sequences by size, and renames them sequentially. Also filters out small contigs if required.
 
 * **gff_name_updater.py** | Updates the contig names of gff file made on one fasta file with those in a new fasta file (e.g. a renamed subset of the original file)
+
+* **gff_to_topGO.py** | extracts GO terms from a gff file for use in TopGO
