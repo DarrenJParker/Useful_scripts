@@ -128,125 +128,129 @@ stat_file = open(stat_file_name, "w")
 #stat_file.write("sample_name\ttotal_reads\ttotal_mapped_to_feat\tno_feature\tambiguous\ttoo_low_aQual\tnot_aligned\talignment_not_unique\n")
 stat_file.write("sample_name\ttotal_mapped_to_feat\tno_feature\tambiguous\ttoo_low_aQual\tnot_aligned\talignment_not_unique\n")
 
+file_list = []
 path = in_dir_name
 for path, subdirs, files in os.walk(path):
 	for name in files:
 		file_path = os.path.join(path, name)
-		
-		#print(file_path)
-		
 		if file_path.endswith(ending):
-			curr_file = open(file_path)
-			curr_file_gene_N = 0
-			file_N = file_N + 1
-			mapped_to_feat = 0
-			total_reads = 0
-			no_feature = 0
-			ambiguous = 0
-			too_low_aQual = 0
-			not_aligned = 0
-			alignment_not_unique = 0		
-			sample_name = file_path.rstrip("/").split("/")[-1].split(ending)[0]
-			sample_list.append(sample_name)
-			if file_N == 1:
-				first_file = file_path
-				# print(file_path)
-				line_N = 0
-				for line in curr_file:
-					line_N = line_N + 1
-					if line_N != 0:
-						line = line.rstrip("\n").split("\t")
-						gene_name = line[0]
+			print(file_path)
+			file_list.append(file_path)
+
+file_list_s = sorted(file_list)	### order files by name		
+
+for file_path in file_list_s:		
+	curr_file = open(file_path)
+	curr_file_gene_N = 0
+	file_N = file_N + 1
+	mapped_to_feat = 0
+	total_reads = 0
+	no_feature = 0
+	ambiguous = 0
+	too_low_aQual = 0
+	not_aligned = 0
+	alignment_not_unique = 0		
+	sample_name = file_path.rstrip("/").split("/")[-1].split(ending)[0]
+	sample_list.append(sample_name)
+	if file_N == 1:
+		first_file = file_path
+		# print(file_path)
+		line_N = 0
+		for line in curr_file:
+			line_N = line_N + 1
+			if line_N != 0:
+				line = line.rstrip("\n").split("\t")
+				gene_name = line[0]
+				
+				## get non-gene lines
+				
+				if line[0] == "__no_feature":
+					no_feature = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__ambiguous":
+					ambiguous = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__too_low_aQual":
+					too_low_aQual = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__not_aligned":
+					not_aligned = line[1]
+					total_reads = total_reads + int(line[1])							
+				elif line[0] == "__alignment_not_unique":
+					alignment_not_unique = line[1]
+					total_reads = total_reads + int(line[1])
+				
+				else:
+					
+					## orth option
+					if do_orthos == "YES":
+						gene_name = gene_name.split(orth_split)[0]
+					
+					cnt_val = int(line[1])
+					if gene_name not in gene_seen:
+						gene_seen.add(gene_name)
+						count_dict[gene_name] = [cnt_val]
+						gene_list.append(gene_name)
+						curr_file_gene_N = curr_file_gene_N + 1
+						total_reads = total_reads + cnt_val
+						mapped_to_feat = mapped_to_feat + cnt_val
+					else:
+						print("Gene names (or orth names if using -Z option) are NOT unique in the first file read in (" + file_path + "), Please fix this before continuing, Exiting!" )
+						sys.exit(2)
+					
+	else:
+		#print(file_path)
+		line_N = 0
+		for line in curr_file:
+			line_N = line_N + 1
+			if line_N != 0:
+				line = line.rstrip("\n").split("\t")
+				gene_name = line[0]
+				
+				## get non-gene lines
+				
+				if line[0] == "__no_feature":
+					no_feature = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__ambiguous":
+					ambiguous = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__too_low_aQual":
+					too_low_aQual = line[1]
+					total_reads = total_reads + int(line[1])
+				elif line[0] == "__not_aligned":
+					not_aligned = line[1]
+					total_reads = total_reads + int(line[1])							
+				elif line[0] == "__alignment_not_unique":
+					alignment_not_unique = line[1]
+					total_reads = total_reads + int(line[1])
+				
+				else:
+										
+					## orth option
+					if do_orthos == "YES":
+						gene_name = gene_name.split(orth_split)[0]
+
+					cnt_val = int(line[1])
+					rec = count_dict.get(gene_name)
+					if rec == None:
+						print("There are additional Gene names (or orth names if using -Z option) in " + file_path + " that were not in the first file read in (" +  first_file + "), Please fix this before continuing, Exiting!" )
+						sys.exit(2)
+					else:
+						rec.append(cnt_val)
+						count_dict[gene_name] = rec
+						curr_file_gene_N = curr_file_gene_N + 1
+						total_reads = total_reads + cnt_val
+						mapped_to_feat = mapped_to_feat + cnt_val
 						
-						## get non-gene lines
-						
-						if line[0] == "__no_feature":
-							no_feature = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__ambiguous":
-							ambiguous = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__too_low_aQual":
-							too_low_aQual = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__not_aligned":
-							not_aligned = line[1]
-							total_reads = total_reads + int(line[1])							
-						elif line[0] == "__alignment_not_unique":
-							alignment_not_unique = line[1]
-							total_reads = total_reads + int(line[1])
-						
-						else:
-							
-							## orth option
-							if do_orthos == "YES":
-								gene_name = gene_name.split(orth_split)[0]
-							
-							cnt_val = int(line[1])
-							if gene_name not in gene_seen:
-								gene_seen.add(gene_name)
-								count_dict[gene_name] = [cnt_val]
-								gene_list.append(gene_name)
-								curr_file_gene_N = curr_file_gene_N + 1
-								total_reads = total_reads + cnt_val
-								mapped_to_feat = mapped_to_feat + cnt_val
-							else:
-								print("Gene names (or orth names if using -Z option) are NOT unique in the first file read in (" + file_path + "), Please fix this before continuing, Exiting!" )
-								sys.exit(2)
-							
-			else:
-				#print(file_path)
-				line_N = 0
-				for line in curr_file:
-					line_N = line_N + 1
-					if line_N != 0:
-						line = line.rstrip("\n").split("\t")
-						gene_name = line[0]
-						
-						## get non-gene lines
-						
-						if line[0] == "__no_feature":
-							no_feature = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__ambiguous":
-							ambiguous = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__too_low_aQual":
-							too_low_aQual = line[1]
-							total_reads = total_reads + int(line[1])
-						elif line[0] == "__not_aligned":
-							not_aligned = line[1]
-							total_reads = total_reads + int(line[1])							
-						elif line[0] == "__alignment_not_unique":
-							alignment_not_unique = line[1]
-							total_reads = total_reads + int(line[1])
-						
-						else:
-												
-							## orth option
-							if do_orthos == "YES":
-								gene_name = gene_name.split(orth_split)[0]
+	gene_N_read.append(curr_file_gene_N)
+	# print(curr_file_gene_N)
+	# print(total_reads_mapped)
 	
-							cnt_val = int(line[1])
-							rec = count_dict.get(gene_name)
-							if rec == None:
-								print("There are additional Gene names (or orth names if using -Z option) in " + file_path + " that were not in the first file read in (" +  first_file + "), Please fix this before continuing, Exiting!" )
-								sys.exit(2)
-							else:
-								rec.append(cnt_val)
-								count_dict[gene_name] = rec
-								curr_file_gene_N = curr_file_gene_N + 1
-								total_reads = total_reads + cnt_val
-								mapped_to_feat = mapped_to_feat + cnt_val
-								
-			gene_N_read.append(curr_file_gene_N)
-			# print(curr_file_gene_N)
-			# print(total_reads_mapped)
-			
-			## not adding total anymore as when mapping non-uniq this becomes wrong
-			#stat_file.write(sample_name + "\t" + str(total_reads) + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
-			stat_file.write(sample_name + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
-						
+	## not adding total anymore as when mapping non-uniq this becomes wrong
+	#stat_file.write(sample_name + "\t" + str(total_reads) + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
+	stat_file.write(sample_name + "\t" + str(mapped_to_feat) + "\t" + str(no_feature) + "\t" + str(ambiguous) + "\t" + str(too_low_aQual) + "\t" + str(not_aligned) + "\t" + str(alignment_not_unique) + "\n")
+				
 			
 			
 	
