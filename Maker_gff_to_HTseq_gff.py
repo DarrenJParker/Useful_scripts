@@ -64,14 +64,18 @@ trans_names = set()
 in_gff = open(in_file_name)
 for line in in_gff:
 	line = line.rstrip("\n")
-	feature = line.split("\t")[2]
-	if feature == "mRNA":
-		descrip_line = line.split("\t")[8]
-		gene_name = descrip_line.split("Parent=")[1].split(";")[0]
-		trans_name = descrip_line.split("ID=")[1].split(";")[0]
-		gene_names.add(gene_name)
-		trans_names.add(trans_name)
-		trans_to_gene_dict[trans_name] = gene_name
+
+	if len(line.split("\t")) >= 5:
+		
+		feature = line.split("\t")[2]
+		if feature.endswith("RNA") or feature == "pseudogene":
+			descrip_line = line.split("\t")[8]
+			if len(descrip_line.split("Parent=")) != 1:
+				gene_name = descrip_line.split("Parent=")[1].split(";")[0]
+				trans_name = descrip_line.split("ID=")[1].split(";")[0]
+				gene_names.add(gene_name)
+				trans_names.add(trans_name)
+				trans_to_gene_dict[trans_name] = gene_name
 in_gff.close()		
 
 
@@ -88,58 +92,65 @@ skipped_features = set()
 in_gff = open(in_file_name)
 for line in in_gff:
 	line = line.rstrip("\n")
-	feature = line.split("\t")[2]
-	descrip_line = line.split("\t")[8]
-	if feature == "gene":
-		out_gff_file.write(line.rstrip(";")  + ";" + "\n")
-	elif feature == "mRNA":
-		trans_ID = descrip_line.split("ID=")[1].split(";")[0]
-		gene_name =  trans_to_gene_dict.get(trans_ID)
-		if gene_name == None:
-			print("Something has gone wrong, Exiting!")
-			sys.exit(2)
-		
-		out_gff_file.write(line.rstrip(";") + ";" + "gene_id=" + gene_name + ";" + "\n")
-			
-			
-	else:
-		try:
-			parents = descrip_line.split("Parent=")[1].split(";")[0].split(",")
-			
-			#print(parents)
-			gene_name = ""
-			
-			if len(parents) == 1:
-				parent = parents[0]
-				gene_name =  trans_to_gene_dict.get(parent)
-			else:
-				### check features come from the same gene when multiple mRNAs
-				
-				parent_set = set()
-				for el in parents:
-					gene_name_t =  trans_to_gene_dict.get(el)	
-					parent_set.add(gene_name_t)
-				if len(parent_set) != 1:
-					print("Features have different gene parents..., Exiting!")
-					sys.exit(2)
-					
-				parent = parents[0]	
-				gene_name =  trans_to_gene_dict.get(parent)
-			
+	if len(line.split("\t")) >= 5:
+		#print(line)
+		feature = line.split("\t")[2]
+		descrip_line = line.split("\t")[8]
+		if feature == "gene":
+			out_gff_file.write(line.rstrip(";")  + ";" + "\n")
+		elif feature.endswith("RNA") or feature == "pseudogene" or feature == "protein":
+			trans_ID = descrip_line.split("ID=")[1].split(";")[0]
+			gene_name =  trans_to_gene_dict.get(trans_ID)
 			if gene_name == None:
-				print("Something has gone wrong, Exiting!")
-				sys.exit(2)
+				trans_ID = descrip_line.split("Derives_from=")[1].split(";")[0]
+				gene_name =  trans_to_gene_dict.get(trans_ID)
+				if gene_name == None:
+					print("Something has gone wrong line 105, Exiting!")
+					sys.exit(2)
 	
-			if gene_name == "":
-				print("Something has gone wrong, Exiting!")
-				sys.exit(2)
-				
 			out_gff_file.write(line.rstrip(";") + ";" + "gene_id=" + gene_name + ";" + "\n")
-		
-		## SKIp features that do not have Parent IDs (these should be masking annotations)
-		except:
-			out_gff_file.write(line.rstrip(";") + ";" + "\n")
-			skipped_features.add(feature)
+				
+				
+		else:
+			try:
+				parents = descrip_line.split("Parent=")[1].split(";")[0].split(",")
+				
+				#print(parents)
+				gene_name = ""
+				
+				if len(parents) == 1:
+					parent = parents[0]
+					gene_name =  trans_to_gene_dict.get(parent)
+				else:
+					### check features come from the same gene when multiple mRNAs
+					
+					parent_set = set()
+					for el in parents:
+						gene_name_t =  trans_to_gene_dict.get(el)	
+						parent_set.add(gene_name_t)
+					if len(parent_set) != 1:
+						print("Features have different gene parents..., Exiting!")
+						sys.exit(2)
+						
+					parent = parents[0]	
+					gene_name =  trans_to_gene_dict.get(parent)
+				
+				# if gene_name == None:
+				# 	print("Something has gone wrong, Exiting!")
+				# 	sys.exit(2)
+				# 
+				# if gene_name == "":
+				# 	print("Something has gone wrong, Exiting!")
+				# 	sys.exit(2)
+					
+				out_gff_file.write(line.rstrip(";") + ";" + "gene_id=" + gene_name + ";" + "\n")
+			
+			## SKIp features that do not have Parent IDs (these should be masking annotations)
+			except:
+				# if feature == "protein":
+				# 	print(line)
+				out_gff_file.write(line.rstrip(";") + ";" + "\n")
+				skipped_features.add(feature)
 
 print("\nThe following features were skipped as the have no Parent ID. (Note - only really worry if any of these are exon. having 'match' listed here is expected)")
 print(skipped_features)			
