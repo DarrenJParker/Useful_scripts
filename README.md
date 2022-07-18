@@ -11,8 +11,6 @@ All scripts written in python3.4 or higher.
 
 ## Scripts
 
-* **extract_fasta_region.py** | Extracts a region of a sequence from a fasta file.
-
 * **fasta_file_tidier.py** | Takes a fasta file, orders sequences by size, and renames them sequentially. Also filters out small contigs if required.
 
 * **Kalli_to_edgeR.py** | Takes a directory of Kallisto produced directories a single csv file for use in EdgeR (or similar), along with a stat file.
